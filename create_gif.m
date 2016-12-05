@@ -6,13 +6,13 @@ function [] = create_gif(datType,fSpeed)
 % datType = ['pairs_' pnum '\accel_' pnum]
 % fSpeed = 4
 
-folderStr = ['F:\surge_project\code\figures\' datType]
+folderStr = ['D:\Documents\Courses\surge_project\code\klutlan_centerline\figures\' datType]
 
 imStr = cellstr(ls(folderStr))
 imStr(1:2)=[]
 
 % here is the output filname
-fOut= ['F:\surge_project\code\figures\' datType '.gif']
+fOut= ['D:\Documents\Courses\surge_project\code\klutlan_centerline\figures\' datType '.gif']
 
 % make an array of times that you want the dates the be separated by (seconds)
 %%

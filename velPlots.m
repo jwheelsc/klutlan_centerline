@@ -24,7 +24,8 @@ load('cSeas.mat')
 % load('velAll.mat')
 % load('hodgsonMask.mat')
 % load('centerLHodgson.mat')
-load(['keep_' pnum '.mat'])
+% load(['keep_' pnum '.mat'])
+load(['keep_i_klutlan_' pnum '_626364.mat'])
 seasB = length(seas(:,1))
 load('klutlanMask.mat')
 load('contCKlut.mat')
@@ -38,7 +39,7 @@ diffD = cC(2:end,:)-cC(1:end-1,:);
 centerD = [0;sqrt(sum(diffD.^2,2))];
 ccD = cumsum(centerD);
 
-folderStr_63 = 'C:\Users\cromp\Desktop\laptop_surge_project\p063_r017\'
+folderStr_63 = 'D:\Documents\Courses\surge_project\velocity_dec05\p063_r017\'
 lsNames_63 = cellstr(ls([folderStr_63 '*_0' pnum '_*.nc']));
 lsNamesTif_63 = cellstr(ls([folderStr_63 '*_0' pnum '_*.tif']));
 for i = 1:length(lsNames_63)
@@ -47,7 +48,7 @@ for i = 1:length(lsNames_63)
     fNameTif_63{i}  = [folderStr_63 lsNamesTif_63{i}]; 
     
 end
-folderStr_62 = 'C:\Users\cromp\Desktop\laptop_surge_project\p062_r017\'
+folderStr_62 = 'D:\Documents\Courses\surge_project\velocity_dec05\p062_r017\'
 lsNames_62 = cellstr(ls([folderStr_62 '*_0' pnum '_*.nc']));
 lsNamesTif_62 = cellstr(ls([folderStr_62 '*_0' pnum '_*.tif']));
 for i = 1:length(lsNames_62)
@@ -57,8 +58,20 @@ for i = 1:length(lsNames_62)
     
 end
 % 
-fName = [fName_62,fName_63];
-fNameTif = [fNameTif_62,fNameTif_63];
+
+
+folderStr_64 = 'D:\Documents\Courses\surge_project\velocity_dec05\p064_r017\'
+lsNames_64 = cellstr(ls([folderStr_64 '*_0' pnum '_*.nc']));
+lsNamesTif_64 = cellstr(ls([folderStr_64 '*_0' pnum '_*.tif']));
+for i = 1:length(lsNames_64)
+
+    fName_64{i} = [folderStr_64 lsNames_64{i}];
+    fNameTif_64{i}  = [folderStr_64 lsNamesTif_64{i}]; 
+    
+end
+% 
+fName = [fName_62,fName_63,fName_64];
+fNameTif = [fNameTif_62,fNameTif_63,fNameTif_64];
 
 % fName = [fName_63];
 % fNameTif = [fNameTif_63];
@@ -66,7 +79,7 @@ fNameTif = [fNameTif_62,fNameTif_63];
 for i = 1:length(fName)
 
     varN = fName{i};
-    namArr{i} = varN(50:57);
+    namArr{i} = varN(83:90)
     
 end
 [blank,elSrt] = sort(namArr);
@@ -79,15 +92,16 @@ loopArr = 1:length(fName)
 %%
 close all
 f1 = figure('units','normalized','outerposition',[0 0 1 1])
-fs = 10
-
+fs = 14
+sos = 33
 count = 1
-
-for ii = 1:length(keep_i)
-    i = keep_i(ii)
-% for i= 43:length(loopArr)
-%     for i = 62
-    
+% 
+% for ii = 1:length(keep_i)
+%     i = keep_i(ii)
+% for i= 1:length(loopArr) 
+for i = 90;
+    close all
+    f1 = figure
     fName = fNameA{i};
     fNameTif = fNameTifA{i}; 
 
@@ -150,13 +164,13 @@ for ii = 1:length(keep_i)
 %     set(gca,'xdir','reverse')
 
 %     
-    subplot(1,2,1)
+%     subplot(1,2,1)
     imagesc(xArr,yArr,(vv))
     xlim([xArr(xl) xArr(xu)])
     ylim([yArr(yl) yArr(yu)])
-    c = colorbar
-    c.Label.String = 'm/d'
-    caxis([0 10])
+    c = colorbar;
+    c.Label.String = 'm/d';
+    caxis([0 7]);
 %     alpha(ih,'0.1')
     ylabel('UTM northing')
     xlabel('UTM easting')
@@ -169,75 +183,74 @@ for ii = 1:length(keep_i)
 %     plot(centerline(:,1),centerline(:,2),'r+')
 % %     
 
-
-    clML = [];
-    for j = 1:length(centerline(:,1))
-
-        px = centerline(j,1);
-        py = centerline(j,2);
-        p1 = find(abs(xArr-px)<150.2);
-        p1 = p1(end)
-        clML(j,1) = p1;
-        p2 = find(abs(yArr-py)<150.2);
-        clML(j,2) = p2;
-
-    end
-%     clMLu = unique(clML,'rows');
-%     hold on
-    clMLu = clML;
-    hold on
-    
-    for j = 1:length(clMLu(:,1))
-        xEl = clMLu(j,1);
-        yEl = clMLu(j,2);
-        xC = xArr(xEl);
-        yC = yArr(yEl);
-        subplot(1,2,1)
-        hold on
-        plot(xC,yC,'r+')
-        vp(j) = vv(yEl,xEl);
-        
-        dcC = cC-repmat([xC,yC],length(cC(:,1)),1);
-        dC = sqrt(sum(dcC.^2,2));
-        min_dCel = find(dC==min(dC));
-        dvp(j) = ccD(min_dCel(1));
-       
-    end
-%     sp1.NextPlot = 'ReplaceChildren';
-    sp2 = subplot(1,2,2)
-    day1 = str2num(fName([55:57]+27));
-    fracD = day1/365;
-    elSB = ceil(fracD*seasB);
-    elSBA(count) = elSB;
-    colorB = seas(elSB,end:-1:1);
-    plot(dvp/1000,vp,'ko','markerfacecolor',colorB)
-    ylim([0 10])
-    xlim([0 25])
-    grid on
-    title(['path ' fName([38:40]+27) ' row ' fName([42:44]+27) ' -- from ' fName([50:53]+27) '-' fName([55:57]+27) ' to ' fName([59:62]+27) '-' fName([64:66]+27) '---i = ' num2str(i)])
-%     sp2.NextPlot = 'ReplaceChildren';
-
-    set(gca,'fontsize',fs)
 % 
-    vpA(count,:) = vp; 
-    dvpS(count,:) = dvp;
-%     pause(.1)
-    ylabel('Speed (m/d)')
-    xlabel('Centerline distance (km)')
-    cm2 = colormap(sp2,seas(:,end:-1:1))
-    cb2 = colorbar
-%     cb2.TickLabels = []
-    cb2.Ticks = [0 0.25 0.5 0.75 1]
-    cb2.TickLabels = {'January','April','July','October','January'}
-%     set(ax, 'xdir','reverse')
-
-    savePDFfunction(f1,['C:\Users\cromp\Desktop\laptop_surge_project\code klutlan\figures\vel_' pnum '_mask\' fName([38:66]+27) ])
-    %     savePDFfunction(f1,['F:\surge_project\code\figures\pairs_' pnum '\colorMap46_' pnum '\' fName(38:66)])
-
+%     clML = [];
+%     for j = 1:length(centerline(:,1))
+% 
+%         px = centerline(j,1);
+%         py = centerline(j,2);
+%         p1 = find(abs(xArr-px)<150.2);
+%         p1 = p1(end);
+%         clML(j,1) = p1;
+%         p2 = find(abs(yArr-py)<150.2);
+%         clML(j,2) = p2;
+% 
+%     end
+% %     clMLu = unique(clML,'rows');
+% %     hold on
+%     clMLu = clML;
+%     hold on
+%     
+%     for j = 1:length(clMLu(:,1))
+%         xEl = clMLu(j,1);
+%         yEl = clMLu(j,2);
+%         xC = xArr(xEl);
+%         yC = yArr(yEl);
+%         subplot(1,2,1)
+%         hold on
+%         plot(xC,yC,'r+')
+%         vp(j) = vv(yEl,xEl);
+%         
+%         dcC = cC-repmat([xC,yC],length(cC(:,1)),1);
+%         dC = sqrt(sum(dcC.^2,2));
+%         min_dCel = find(dC==min(dC));
+%         dvp(j) = ccD(min_dCel(1));
+%        
+%     end
+%     sp1.NextPlot = 'ReplaceChildren';
+%     sp2 = subplot(1,2,2)
+%     day1 = str2num(fName([55:57]+sos));
+%     fracD = day1/365;
+%     elSB = ceil(fracD*seasB);
+%     elSBA(count) = elSB;
+%     colorB = seas(elSB,end:-1:1);
+%     plot(dvp/1000,vp,'ko','markerfacecolor',colorB)
+%     ylim([0 10])
+%     xlim([0 25])
+%     grid on
+    title(['path ' fName([38:40]+sos) ' row ' fName([42:44]+sos) ' -- from ' fName([50:53]+sos) '-' fName([55:57]+sos) ' to ' fName([59:62]+sos) '-' fName([64:66]+sos) '---i = ' num2str(i)])
+%     sp2.NextPlot = 'ReplaceChildren';
+return
+%     set(gca,'fontsize',fs)
+% % 
+%     vpA(count,:) = vp; 
+%     dvpS(count,:) = dvp;
+% %     pause(.1)
+%     ylabel('Speed (m/d)')
+%     xlabel('Centerline distance (km)')
+%     cm2 = colormap(sp2,seas(:,end:-1:1));
+%     cb2 = colorbar;
+% %     cb2.TickLabels = []
+%     cb2.Ticks = [0 0.25 0.5 0.75 1]
+%     cb2.TickLabels = {'January','April','July','October','January'}
+% %     set(ax, 'xdir','reverse')
+% % 
+    savePDFfunction(f1,['D:\Documents\Courses\surge_project\code\klutlan_centerline\figures\vel_imagesc\' fName([38:66]+sos) ])
     
 %     Fcrop(i) = getframe(f1)
     count = count+1
 %     pause(0.5)
+
     
 end
 
@@ -287,9 +300,10 @@ ylabel('Day since Jan 01 - 2013')
 xlabel('Centerline distance (m)')
 cb = colorbar
 cb.Label.String = 'Speed (m/d)'
+caxis([0 5])
 set(gca,'fontsize',18)
-title(['Steele glacier velocity from ' pnum ' day pairs'])
-% savePDFfunction(f2,['F:\surge_project\code\figures\pairs_' pnum '\vel_Hod_' pnum])
+title(['Klutlan glacier velocity from ' pnum ' day pairs'])
+savePDFfunction(f2,['D:\Documents\Courses\surge_project\code\klutlan_centerline\figures\vel_spaceTime'])
 % 
 %%
 
@@ -298,6 +312,7 @@ f3 = surf(jDay,x1,vpAs')
 xlabel('Day')
 ylabel('Centerline distance (m)')
 zlabel('Speed (m/day)')
+zlim([0 5])
 grid on
 view([-170 45])
 hold on
@@ -307,9 +322,9 @@ hold on
 plot([365*2 365*2],yl,'r')
 hold on
 plot([365*3 365*3],yl,'r')
-savefig(['F:\surge_project\code\figures\pairs_' pnum '\vel_' pnum '_surface'])
+savefig(['D:\Documents\Courses\surge_project\code\klutlan_centerline\figures\vel_spaceTime'])
 %% just velocity 
-
+close all
 
 delDay = jDay(2:end)-jDay(1:end-1)
 
@@ -320,8 +335,8 @@ for i = 1:length(keep_i)
     fName = fNameA{ii};
     colorB = seas(elSBA(i),end:-1:1);
     plot(dvpSs(i,:),vpAs(i,:),'ko','markerfacecolor',colorB)
-    ylim([0 10])
-    xlim([0 6000])
+    ylim([0 7])
+    xlim([0 27000])
     grid on
 %     colormap 'winter'
     colormap(seas(:,end:-1:1))
@@ -329,11 +344,12 @@ for i = 1:length(keep_i)
     cb2.Ticks = [0 0.25 0.5 0.75 1]
     cb2.TickLabels = {'January','April','July','October','January'}
     xlabel('Centerline distance (m)')
-    ylabel('Speeed (m/d)')
+    ylabel('Speed (m/d)')
     set(gca,'fontsize',18)
-    title(['path ' fName(38:40) ' row ' fName(42:44) ' -- from ' fName(50:53) '-' fName(55:57) ' to ' fName(59:62) '-' fName(64:66)])
-    savePDFfunction(f3,['F:\surge_project\code\figures\pairs_' pnum '\vel_Hodg_' pnum '_dt\' fName(38:66)])
+    title(['path ' fName([38:40]+sos) ' row ' fName([42:44]+sos) ' -- from ' fName([50:53]+sos) '-' fName([55:57]+sos) ' to ' fName([59:62]+sos) '-' fName([64:66]+sos)])
+    savePDFfunction(f3,['D:\Documents\Courses\surge_project\code\klutlan_centerline\figures\vel_Klutlan_dt\' fName([38:66]+sos)])
 %     pause(timeArr(i))
+
     
 end
 
@@ -351,8 +367,8 @@ for i = 1:length(keep_i)
     hold on
     colorB = seas(elSBA(i),end:-1:1);
     plot(dvpSs(i,:),vpAs(i,:),'ko','markerfacecolor',colorB)
-    ylim([0 15])
-    xlim([0 40000])
+    ylim([0 7])
+    xlim([0 27000])
     grid on
 %     colormap 'winter'
     colormap(seas(:,end:-1:1))
@@ -360,10 +376,10 @@ for i = 1:length(keep_i)
     cb2.Ticks = [0 0.25 0.5 0.75 1]
     cb2.TickLabels = {'January','April','July','October','January'}
     xlabel('Centerline distance (m)')
-    ylabel('Speeed (m/d)')
+    ylabel('Speed (m/d)')
     set(gca,'fontsize',18)
-    title(['path ' fName(38:40) ' row ' fName(42:44) ' -- from ' fName(50:53) '-' fName(55:57) ' to ' fName(59:62) '-' fName(64:66)])
-    savePDFfunction(f3,['F:\surge_project\code\figures\pairs_' pnum '\vel_' pnum '_dtCont\' fName(38:66)])
+    title(['path ' fName([38:40]+sos) ' row ' fName([42:44]+sos) ' -- from ' fName([50:53]+sos) '-' fName([55:57]+sos) ' to ' fName([59:62]+sos) '-' fName([64:66]+sos)])
+    savePDFfunction(f3,['D:\Documents\Courses\surge_project\code\klutlan_centerline\figures\vel_Klutlan_dtCont\' fName([38:66]+sos)])
 %     pause(timeArr(i))
     
 end
@@ -393,7 +409,7 @@ for i = 1:length(keep_i)
     ylabel('Speeed (m/d)')
     set(gca,'fontsize',18)
     title(['path ' fName(38:40) ' row ' fName(42:44) ' -- from ' fName(50:53) '-' fName(55:57) ' to ' fName(59:62) '-' fName(64:66)])
-    savePDFfunction(f3,['F:\surge_project\code\figures\pairs_' pnum '\vel_' pnum '_dt_term\' fName(38:66)])
+    savePDFfunction(f3,['F:\surge_project\code\figures\pairs_' pnum '\vel_' pnum '_dt_term\' fName([38:66]+sos)])
 %     pause(timeArr(i))
     
 end
@@ -424,7 +440,7 @@ for i = 1:length(keep_i)
     ylabel('Speeed (m/d)')
     set(gca,'fontsize',18)
     title(['path ' fName(38:40) ' row ' fName(42:44) ' -- from ' fName(50:53) '-' fName(55:57) ' to ' fName(59:62) '-' fName(64:66)])
-    savePDFfunction(f3,['F:\surge_project\code\figures\pairs_' pnum '\vel_' pnum '_dtCont_term\' fName(38:66)])
+    savePDFfunction(f3,['F:\surge_project\code\figures\pairs_' pnum '\vel_' pnum '_dtCont_term\' fName([38:66]+sos)])
 %     pause(timeArr(i))
     
 end
@@ -461,7 +477,7 @@ for i = 1:length(keep_i)
     xlabel('Centerline distance (m)')
     ylabel('Speeed (m/d)')
     set(gca,'fontsize',18)
-    title(['path ' fName(38:40) ' row ' fName(42:44) ' -- from ' fName(50:53) '-' fName(55:57) ' to ' fName(59:62) '-' fName(64:66)])
+    title(['path ' fName([38:40]+sos) ' row ' fName([42:44]+sos) ' -- from ' fName([50:53]+sos) '-' fName([55:57]+sos) ' to ' fName([59:62]+sos) '-' fName([64:66]+sos)])
 %     savePDFfunction(f3,['F:\surge_project\code\figures\vel_32_dt\' fName(38:66)])
     
 
@@ -474,7 +490,7 @@ for i = 1:length(keep_i)
     hold on
     plot(get(gca,'xlim'),[0 0],'k')
     yar.NextPlot = 'ReplaceChildren';
-    savePDFfunction(f4,['F:\surge_project\code\figures\pairs_' pnum '\vel_compress_' pnum '\' fName(38:66)])
+    savePDFfunction(f4,['D:\Documents\Courses\surge_project\code\klutlan_centerline\figures\vel_compress\' fName([38:66]+sos)])
 end
 
 %% going to try to get acceleration
@@ -501,8 +517,8 @@ for i = 1:length(keep_i)-1
     ylabel('Acceleration (m/d^{2})')
     set(gca,'fontsize',18)
     ylim([-2e-1 2e-1])
-    title(['path ' fName(38:40) ' row ' fName(42:44) ' -- from ' fName(50:53) '-' fName(55:57) ' to ' fName(59:62) '-' fName(64:66)])
-    savePDFfunction(f3,['F:\surge_project\code\figures\pairs_' pnum '\accel_' pnum '\' fName(38:66)])
+    title(['path ' fName([38:40]+sos) ' row ' fName([42:44]+sos) ' -- from ' fName([50:53]+sos) '-' fName([55:57]+sos) ' to ' fName([59:62]+sos) '-' fName([64:66]+sos)])
+    savePDFfunction(f3,['D:\Documents\Courses\surge_project\code\klutlan_centerline\figures\accel\' fName([38:66]+sos)])
 %     pause(timeArr(i))
     pause(0.5)
     
@@ -534,8 +550,8 @@ for i = 1:length(keep_i)-1
     ylabel('Speeed (m/d)')
     set(gca,'fontsize',18)
     ylim([-1.5e-1 1.5e-1])
-    title(['path ' fName(38:40) ' row ' fName(42:44) ' -- from ' fName(50:53) '-' fName(55:57) ' to ' fName(59:62) '-' fName(64:66)])
-    savePDFfunction(f3,['F:\surge_project\code\figures\pairs_' pnum '\accel_' pnum '_cont\' fName(38:66)])
+    title(['path ' fName([38:40]+sos) ' row ' fName([42:44]+sos) ' -- from ' fName([50:53]+sos) '-' fName([55:57]+sos) ' to ' fName([59:62]+sos) '-' fName([64:66]+sos)])
+    savePDFfunction(f3,['F:\surge_project\code\figures\pairs_' pnum '\accel_' pnum '_cont\' fName([38:66]+sos)])
 %     pause(timeArr(i))
     pause(0.5)
     
@@ -603,7 +619,7 @@ for i = 1:length(keep_i)-1
 %     xlabel('Centerline distance (m)')
     ylabel('Speed (m/d)')
     set(gca,'fontsize',18)
-    title(['path ' fName(38:40) ' row ' fName(42:44) ' -- from ' fName(50:53) '-' fName(55:57) ' to ' fName(59:62) '-' fName(64:66)])
+    title(['path ' fName([38:40]+sos) ' row ' fName([42:44]+sos) ' -- from ' fName([50:53]+sos) '-' fName([55:57]+sos) ' to ' fName([59:62]+sos) '-' fName([64:66]+sos)])
 
     subplot(2,1,2)
     colorB = seas(elSBA(i),end:-1:1);
@@ -621,7 +637,7 @@ for i = 1:length(keep_i)-1
     set(gca,'fontsize',18)
     ylim([-2e-1 2e-1])
 %     title(['path ' fName(38:40) ' row ' fName(42:44) ' -- from ' fName(50:53) '-' fName(55:57) ' to ' fName(59:62) '-' fName(64:66)])
-    savePDFfunction(f3,['F:\surge_project\code\figures\pairs_' pnum '\velANDaccel_' pnum '\' fName(38:66)])
+    savePDFfunction(f3,['D:\Documents\Courses\surge_project\code\klutlan_centerline\figures\velANDaccel\' fName([38:66]+sos)])
 %     keyboard
 
 end
